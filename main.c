@@ -64,7 +64,7 @@ int main(void) {
 
 
 
-
+    //Player stuff, testing as of now
 
     bool collision = false;
 
@@ -158,18 +158,11 @@ int main(void) {
 
       }
 
+      //Reseting player pos
       if(playerPosition.y < 1.5f){
-
-          playerPosition.y = 1.5f;
+           playerPosition.y = 1.5f;
 
       }
-
-
-
-
-
-
-
 
 
       //--------------------------------------------
@@ -187,13 +180,6 @@ int main(void) {
       if(CheckCollisionBoxes((BoundingBox){testCubeCollision},(BoundingBox){camera.position})){
         collision = true;
 }
-
-      if(collision){
-          printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-      }
-
-
-
 
 
       //----------------------------------
