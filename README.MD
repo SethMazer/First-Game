@@ -5,6 +5,7 @@ Hello, this is my first attempt at a game. The ultimate goal is to just have 3D 
 # How does it work?
 
 W,A,S,D controls, along with the ability to Jump. You spawn in, and can jump and walk around.
+Read Commented code for detailed technical explanation
 
 
 # Coming soon
