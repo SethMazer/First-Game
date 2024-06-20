@@ -17,4 +17,4 @@ Far in the future once the core gameplay is built, checkpoints, punishments, and
 
 # Demo as of 6|10|2024
 
-![](https://github.com/SethMazer/First-Game/blob/main/Game%20Demo.gif)
+![](https://github.com/SethMazer/First-Game/blob/main/Demo_6_20_24.gif)
