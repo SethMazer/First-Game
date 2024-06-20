@@ -10,7 +10,7 @@
 
 
 //Function to draw the structure
-void makeStructure(){
+void makeGround(){
 
     //Setting background
     ClearBackground(SKYBLUE);
@@ -20,6 +20,7 @@ void makeStructure(){
 
 
 };
+
 
 
 // -------------------------------
@@ -51,16 +52,17 @@ int main(void) {
   DisableCursor();
   SetTargetFPS(60);
   Vector3 prevCameraPosition = camera.position;
+  Vector3 prevPlayerPosition;
 
 
 
   //Movement variables
   float walkingVelocity = 0.1f;
-  float runningVelocity = 3.0f;
+  float runningVelocity = 0.2f;
   float jumpVelocity = 8.0f; //Jump velocity
   const float gravity = -9.81f;
   bool isJumping = false;
-
+  bool isRunning = false;
 
 
 
@@ -68,9 +70,9 @@ int main(void) {
 
     bool collision = false;
 
-    Vector3 playerPosition = {10.0f, 1.5f, 10.0f};
-    Vector3 playerSize = {0.5f, 0.5f, 0.5f};
-    Color playerColor = WHITE;
+//    Vector3 playerPosition = camera.position;
+//    Vector3 playerSize = {0.5f, 0.5f, 0.5f};
+//    Color playerColor = WHITE;
 
 
     Vector3 testCubePosition = {0.0f, 2.0f, 0.0f,};
@@ -85,6 +87,22 @@ int main(void) {
 
   //Main game loop
   while(!WindowShouldClose()){
+
+      //-------------------------------
+      //Player Movement
+      //------------------------------
+
+
+      //Player variables
+      float adjustedPlayerY = (camera.position.y - 0.5f);
+
+      Vector3 playerPosition = {camera.position.x, adjustedPlayerY, camera.position.z};
+      Vector3 playerSize = {1.0f, 1.0f, 1.0f};
+      Color playerColor = WHITE;
+
+      //Setting previous camera and player positions for collision purposes
+      prevCameraPosition = camera.position;
+      prevPlayerPosition = playerPosition;
 
 
       //-------------------------------
@@ -110,24 +128,26 @@ int main(void) {
 
       //Printing camera data to terminal
       //If any camera coord isn't equal to the previous camera coord then print new camera data, this is so there isn't constant camera coord spam from just printing coords on a loop
-      if((camera.position.x != prevCameraPosition.x) || (camera.position.y != prevCameraPosition.y) || (camera.position.z != prevCameraPosition.z) ){
-          printf("| X = %f | Y = %f | Z = %f ", camera.position.x, camera.position.y,
-                 camera.position.z);
-          prevCameraPosition = camera.position;
+//      if((camera.position.x != prevCameraPosition.x) || (camera.position.y != prevCameraPosition.y) || (camera.position.z != prevCameraPosition.z) ){
+//          printf("| X = %f | Y = %f | Z = %f ", camera.position.x, camera.position.y,
+//                 camera.position.z);
+//
+//      }
 
-      }
+
+
 
 
      //------------------------------------
      // Jump Movement
      //-----------------------------------
 
+
       //If player presses space, they jump
       if(IsKeyPressed(KEY_SPACE)){
           isJumping = true;
 
       }
-
 
       //Elevate players camera y level
       if((isJumping)){
@@ -138,10 +158,10 @@ int main(void) {
         camera.position.y += (jumpVelocity * GetFrameTime());
         camera.target.y += (jumpVelocity * GetFrameTime());
 
+        //Elevate player pos y level
         playerPosition.y += (jumpVelocity * GetFrameTime());
 
-
-        printf("Jump Velocity is %f", jumpVelocity);
+//        printf("Jump Velocity is %f", jumpVelocity);
 
 
       }
@@ -154,44 +174,92 @@ int main(void) {
           isJumping = false;
           jumpVelocity = 8.0f;
           camera.position.y = 2.0f;
-          printf("Jump Velocity is %f", jumpVelocity);
 
       }
 
+      //If player pos is below the eye level, reset to eye level
       if(playerPosition.y < 1.5f){
-
           playerPosition.y = 1.5f;
-
       }
 
 
+      //---------------------------------------
+      // Running Movement
+      //---------------------------------------
 
 
+      //If player is holding Lshift, they are running
+      if((IsKeyDown(KEY_LEFT_SHIFT))){
+            isRunning = true;
+            printf("PLAYER IS RUNNING");
+      }
+      //If player is running, increase velocity
+      if(isRunning){
+          walkingVelocity += runningVelocity;
+      }
+      //Keeping running speed at 0.4f
+      if((walkingVelocity > 0.3f) && isRunning){
+          walkingVelocity = 0.3f;
+      }
+      //If player is not running, return to normal walking velocity
+      if(IsKeyReleased(KEY_LEFT_SHIFT)){
+          isRunning = false;
+          walkingVelocity = 0.1f;
+      }
 
 
-
+//      prevCameraPosition = camera.position;
+//      prevPlayerPosition = playerPosition;
 
 
       //--------------------------------------------
-      // Collision Movement
+      // Collision
       //--------------------------------------------
+
 
       //Collision Box
-      Vector3 testCubeCollision = {testCubePosition.x - testCubeDimensions.x/2,
+      Vector3 testCubeCollisionNegative = {testCubePosition.x - testCubeDimensions.x/2,
                                    testCubePosition.y - testCubeDimensions.y/2,
                                    testCubePosition.z - testCubeDimensions.z/2
       };
+      Vector3 testCubeCollisionPositive = {testCubePosition.x + testCubeDimensions.x/2,
+                                           testCubePosition.y + testCubeDimensions.y/2,
+                                           testCubePosition.z + testCubeDimensions.z/2
+      };
+
+      Vector3 playerColNeg = {playerPosition.x - playerSize.x/2,
+                              playerPosition.y - playerSize.y/2,
+                              playerPosition.z - playerSize.z/2};
+
+      Vector3 playerColPos = {playerPosition.x + playerSize.x/2,
+                              playerPosition.y + playerSize.y/2,
+                              playerPosition.z + playerSize.z/2};
 
 
-      //Checking collision camera vs testCube
-      if(CheckCollisionBoxes((BoundingBox){testCubeCollision},(BoundingBox){camera.position})){
-        collision = true;
-}
-
-      if(collision){
-          printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+      //Player collides with test cube, collision = true, and print you collided!
+      if(CheckCollisionBoxes((BoundingBox){testCubeCollisionNegative, testCubeCollisionPositive},(BoundingBox){playerColNeg, playerColPos})) {
+          collision = true;
+      } else {
+          collision = false;
       }
 
+
+      //If colliding, revert players position to the position RIGHT before impact
+      if(collision){
+          printf("COLLISION!");
+//          playerPosition.x = 10.0f, //prevPlayerPosition.x;
+//          playerPosition.y = 2.0f,//prevPlayerPosition.y;
+//          playerPosition.z = 10.0f,//prevPlayerPosition.z;
+//
+//          camera.position.x = 10.0f, //prevCameraPosition.x;
+//          camera.position.y = adjustedPlayerY, //prevCameraPosition.y;
+//          camera.position.z = 10.0f, //prevCameraPosition.z;
+//          collision = false;
+
+
+
+
+      }
 
 
 
@@ -208,12 +276,13 @@ int main(void) {
       BeginMode3D(camera);
 
       //Draw player object
-      DrawCylinder(playerPosition, playerSize.x, playerSize.y, playerSize.z, 20, playerColor);
-      DrawCylinderWires(playerPosition, playerSize.x, playerSize.y, playerSize.z, 20, BLACK);
+      DrawCubeV(playerPosition,playerSize, RED);
+      DrawCubeWiresV(playerPosition, playerSize, BLACK);
 
 
 
-      makeStructure();
+
+      makeGround();
       DrawCubeV(testCubePosition, testCubeDimensions, RED);
       DrawCubeWiresV(testCubePosition, testCubeDimensions, WHITE);
 
