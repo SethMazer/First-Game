@@ -10,7 +10,7 @@ Read Commented code for detailed technical explanation
 
 # Coming soon
 
-As of this README (6|10|2024), the only things implemented are the Jumping feature, some structures, and I have just started to create a player, which the camera will be tied too, and used for collisions.
+As of this README (6|20|2024), I have added some buggy collisions, and I cant remember if I already added sprints or not, but you can now see sprinting in the demo gif
 
 Far in the future once the core gameplay is built, checkpoints, punishments, and level selectors will all most likely be added.
 
